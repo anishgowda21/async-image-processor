@@ -2,7 +2,6 @@ import asyncio
 from fastapi import FastAPI, UploadFile, File, HTTPException,BackgroundTasks
 from fastapi.responses import JSONResponse
 import uuid
-from config import redis_queue
 from utils.validatecsv import validate_csv
 from worker.csv_worker import process_csv
 from repository.db_ops import db_ops
@@ -10,7 +9,6 @@ from My_Exception.custom_exception import CustomException
 from My_models.job_status import JobStatus
 
 app = FastAPI()
-queue = redis_queue.get_queue()
 
 @app.post("/api/upload")
 async def upload_csv(background_tasks: BackgroundTasks,file: UploadFile = File(...)):
@@ -36,13 +34,12 @@ async def upload_csv(background_tasks: BackgroundTasks,file: UploadFile = File(.
 
 @app.get("/api/status/{request_id}")
 async def get_status(request_id: str):
-    job = await db_ops.jobs.find_one({"requestId": request_id})
+    job = await db_ops.get_job_status(request_id)
     if job:
         return JobStatus(
             requestId=job["requestId"],
             status=job["status"],
-            processed=job["processed"],
-            total=job["total"]
+            output_url= job['output_url']
         )
     return JSONResponse(content={"error": "Job not found"}, status_code=404)
 

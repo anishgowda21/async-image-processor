@@ -16,8 +16,9 @@ class DatabaseOperations:
         )
 
     async def get_job_status(self, request_id):
+        print({"requestId": request_id})
         job = await self.db.jobs.find_one({"requestId": request_id})
-        return job["status"] if job else None
+        return job if job else None
 
     async def insert_product(self, product_data):
         return await self.db.products.insert_one(product_data)
