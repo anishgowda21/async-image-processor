@@ -14,11 +14,13 @@ app = FastAPI()
 async def upload_csv(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    webhook_urls: List[str] = Form(default=[])
+    webhook_urls: str = Form(default=[])
     ):
     try:
         csv_stat = await validate_csv(file)        
         request_id = str(uuid.uuid4())
+        if webhook_urls:
+            webhook_urls = webhook_urls.split(",")
 
         await db_ops.insert_job({
             "requestId": request_id,
@@ -47,4 +49,18 @@ async def get_status(request_id: str):
             output_url= job['output_url']
         )
     return JSONResponse(content={"error": "Job not found"}, status_code=404)
+
+
+@app.post("/api/webhook/{request_id}")
+async def add_webhook(request_id: str, webhook_url: str = Form(...)):
+    job = await db_ops.get_job_status(request_id)
+    if not job:
+        return JSONResponse(content={"error": "Job not found"}, status_code=404)
+    
+    if job['status'] != 'pending':
+        return JSONResponse(content={"error": "Cannot add webhook to a completed job"}, status_code=400)
+
+    await db_ops.add_webhook(request_id, webhook_url)
+    return JSONResponse(content={"message": "Webhook added successfully"}, status_code=200)
+
 

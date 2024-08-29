@@ -20,11 +20,5 @@ class DatabaseOperations:
         job = await self.db.jobs.find_one({"requestId": request_id})
         return job if job else None
 
-    async def insert_product(self, product_data):
-        return await self.db.products.insert_one(product_data)
-
-    async def get_webhooks(self):
-        cursor = self.db.webhooks.find()
-        return await cursor.to_list(length=None)
 
 db_ops = DatabaseOperations("mongodb://localhost:27017")

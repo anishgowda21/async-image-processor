@@ -7,6 +7,18 @@ import urllib.parse
 import io
 from config.digi_ocean_config import upload, ENDPOINT_URL
 
+
+async def send_webhook_update(url, data):
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, json=data) as response:
+                if response.status != 200:
+                    print(f"Failed to send webhook to {url}. Status: {response.status}")
+        except Exception as e:
+            print(f"Error sending webhook to {url}: {e}")
+
+
+
 async def process_image(url, req_id, product_name):
     file_name = f"output_compressed_{url.split('/')[-1]}"
     bucket_name = "compressed_images"
@@ -115,7 +127,16 @@ async def process_csv(csv_data, req_id):
 
     try:
         await db_ops.update_job_status(req_id, update_item)
-        await db_ops.insert_product({req_id: results})
+        job = await db_ops.get_job_status(req_id)
+        if job and job.get('webhook_urls'):
+            update_data = {
+                "requestId": req_id,
+                "status": status,
+                "output_url": csv_url if csv_url else ""
+            }
+            webhook_tasks = [send_webhook_update(url, update_data) for url in job['webhook_urls']]
+            await asyncio.gather(*webhook_tasks)
     except Exception as e:
         print(f"Failed to update job status or insert product data: {e}")
         await db_ops.update_job_status(req_id, {"status": "Failed", "error": str(e)})
+
