@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import FastAPI, UploadFile, File, HTTPException,BackgroundTasks,Form
+from fastapi import FastAPI, UploadFile, File,BackgroundTasks,Form
 from fastapi.responses import JSONResponse
 import uuid
 from utils.validatecsv import validate_csv
@@ -19,14 +19,13 @@ async def upload_csv(
     try:
         csv_stat = await validate_csv(file)        
         request_id = str(uuid.uuid4())
-        if webhook_urls:
-            webhook_urls = webhook_urls.split(",")
+        webhook_url_list = [url.strip() for url in webhook_urls.split(",") if url.strip()] if webhook_urls else []
 
         await db_ops.insert_job({
             "requestId": request_id,
             "status": "pending",
             "output_url": "",
-            "webhook_urls": webhook_urls
+            "webhook_urls": webhook_url_list
         })
 
         background_tasks.add_task(process_csv,csv_stat,request_id)

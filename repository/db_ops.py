@@ -1,5 +1,8 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class DatabaseOperations:
     def __init__(self, connection_string):
@@ -16,9 +19,8 @@ class DatabaseOperations:
         )
 
     async def get_job_status(self, request_id):
-        print({"requestId": request_id})
         job = await self.db.jobs.find_one({"requestId": request_id})
         return job if job else None
 
-
-db_ops = DatabaseOperations("mongodb://localhost:27017")
+mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+db_ops = DatabaseOperations(mongo_url)

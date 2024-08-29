@@ -16,9 +16,9 @@ async def upload(file_obj, bucket_name, obj_name):
 
     async with session.client("s3", endpoint_url=ENDPOINT_URL) as s3:
         try:
-            print(f"Uploading {obj_name} to DigitalOcean Spaces")
+            # print(f"Uploading {obj_name} to DigitalOcean Spaces")
             await s3.upload_fileobj(file_obj, bucket_name, obj_name,ExtraArgs={"ACL": "public-read"})
-            print(f"Finished Uploading {obj_name} to DigitalOcean Spaces")
+            # print(f"Finished Uploading {obj_name} to DigitalOcean Spaces")
         except Exception as e:
             print(f"Unable to upload {obj_name} to {bucket_name}: {e} ({type(e)})")
             return ""
