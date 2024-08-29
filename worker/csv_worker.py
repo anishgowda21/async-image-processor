@@ -4,8 +4,9 @@ import csv
 import aiohttp
 from PIL import Image
 import io
+from config.digi_ocean_config import do_client
 
-async def process_image(url, product_name):
+async def process_image(url, req_id,product_name):
      async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             if response.status != 200:
@@ -17,10 +18,16 @@ async def process_image(url, product_name):
         img.save(output, format='JPEG', quality=50)
         output.seek(0)
 
-        file_name = f"{product_name}_output_compressed_{url.split('/')[-1]}"
-        # TODO upload files to digital ocean doing it later
-
-        return file_name
+        file_name = f"output_compressed_{url.split('/')[-1]}"
+        bucket_name = "imagecompress211"  # Replace with your actual bucket name
+        object_name = f"compressed_images/{req_id}/{product_name}/{file_name}"
+        try:
+            # Upload the compressed image to DigitalOcean Spaces
+            do_client.upload_fileobj(output, bucket_name, object_name)
+            print(f"File uploaded successfully to {bucket_name}/{object_name}")
+        except Exception as e:
+            print(f"Failed to upload file to DigitalOcean Spaces: {e}")
+            return None
 
 
 async def process_csv(csv_data,req_id):
@@ -35,7 +42,7 @@ async def process_csv(csv_data,req_id):
 
             tasks = []
             for url in input_urls:
-                tasks.append(process_image(url,product_name))
+                tasks.append(process_image(url,req_id,product_name))
 
             output_urls = await asyncio.gather(*tasks)
 
@@ -49,10 +56,9 @@ async def process_csv(csv_data,req_id):
             "inputImageUrls": input_urls,
             "outputImageUrls": output_urls
             })
-            await db_ops.update_job_status(req_id,"Completed")
-            await db_ops.insert_product({req_id: results})
 
         except Exception as err:
             print(err)
             pass
-
+    await db_ops.update_job_status(req_id,"Completed")
+    # await db_ops.insert_product({req_id: results})
