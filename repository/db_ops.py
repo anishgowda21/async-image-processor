@@ -9,10 +9,10 @@ class DatabaseOperations:
     async def insert_job(self, job_data):
         return await self.db.jobs.insert_one(job_data)
 
-    async def update_job_status(self, request_id, status):
+    async def update_job_status(self, request_id, updateItem):
         return await self.db.jobs.update_one(
             {"requestId": request_id},
-            {"$set": {"status": status}}
+            {"$set": updateItem}
         )
 
     async def get_job_status(self, request_id):
