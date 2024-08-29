@@ -1,14 +1,23 @@
 from typing import List
-from fastapi import FastAPI, UploadFile, File,BackgroundTasks,Form
+from fastapi import FastAPI, UploadFile, File,BackgroundTasks,Form,Request
 from fastapi.responses import JSONResponse
 import uuid
+from fastapi.responses import HTMLResponse
 from utils.validatecsv import validate_csv
 from worker.csv_worker import process_csv
 from repository.db_ops import db_ops
 from My_Exception.custom_exception import CustomException
 from My_models.job_status import JobStatus
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
+
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/api/upload")
 async def upload_csv(

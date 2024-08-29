@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Async Image Processor API Documentation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #333;
+      }
+      pre {
+        background-color: #f4f4f4;
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .code {
+        font-family: monospace;
+        background-color: #eee;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Async Image Processor</h1>
+    <p>An Asynchronous web app to process images from a CSV</p>
+
+    <h2>API Documentation</h2>
+
+    <h3>Base URL</h3>
+    <pre><code>https://139.59.58.99/</code></pre>
+
+    <h3>Endpoints</h3>
+
+    <h4>1. Upload CSV</h4>
+    <ul>
+      <li><strong>URL</strong>: <span class="code">/api/upload</span></li>
+      <li><strong>Method</strong>: <span class="code">POST</span></li>
+      <li>
+        <strong>Content-Type</strong>:
+        <span class="code">multipart/form-data</span>
+      </li>
+    </ul>
+
+    <h4>Request Parameters</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>file</td>
+          <td>File</td>
+          <td>Yes</td>
+          <td>CSV file to be processed</td>
+        </tr>
+        <tr>
+          <td>webhook_urls</td>
+          <td>String</td>
+          <td>No</td>
+          <td>Comma-separated list of webhook URLs</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Response</h4>
+    <pre><code>{
+  "requestId": "string"
+}</code></pre>
+
+    <h4>Status Codes</h4>
+    <ul>
+      <li>202: Accepted</li>
+      <li>400: Bad Request</li>
+      <li>500: Internal Server Error</li>
+    </ul>
+
+    <h4>2. Get Job Status</h4>
+    <ul>
+      <li>
+        <strong>URL</strong>: <span class="code">/api/status/{request_id}</span>
+      </li>
+      <li><strong>Method</strong>: <span class="code">GET</span></li>
+    </ul>
+
+    <h4>Path Parameters</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>request_id</td>
+          <td>String</td>
+          <td>Yes</td>
+          <td>Unique request ID returned from upload API</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Response</h4>
+    <pre><code>{
+  "requestId": "string",
+  "status": "string",
+  "output_url": "string"
+}</code></pre>
+
+    <h4>Status Codes</h4>
+    <ul>
+      <li>200: OK</li>
+      <li>404: Not Found</li>
+      <li>500: Internal Server Error</li>
+    </ul>
+
+    <h4>3. Add Webhook</h4>
+    <ul>
+      <li>
+        <strong>URL</strong>:
+        <span class="code">/api/webhook/{request_id}</span>
+      </li>
+      <li><strong>Method</strong>: <span class="code">POST</span></li>
+      <li>
+        <strong>Content-Type</strong>:
+        <span class="code">application/x-www-form-urlencoded</span>
+      </li>
+    </ul>
+
+    <h4>Path Parameters</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>request_id</td>
+          <td>String</td>
+          <td>Yes</td>
+          <td>Unique request ID for the job</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Request Parameters</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>webhook_url</td>
+          <td>String</td>
+          <td>Yes</td>
+          <td>URL to receive webhook notifications</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Response</h4>
+    <pre><code>{
+  "message": "Webhook added successfully"
+}</code></pre>
+
+    <h4>Status Codes</h4>
+    <ul>
+      <li>200: OK</li>
+      <li>400: Bad Request</li>
+      <li>404: Not Found</li>
+      <li>500: Internal Server Error</li>
+    </ul>
+
+    <h3>Error Responses</h3>
+    <p>All error responses follow this format:</p>
+    <pre><code>{
+  "error": "Error message description"
+}</code></pre>
+
+    <h3>Webhook Payload</h3>
+    <p>
+      When a job is completed, the following payload will be sent to all
+      registered webhook URLs:
+    </p>
+    <pre><code>{
+  "requestId": "string",
+  "status": "string",
+  "output_url": "string"
+}</code></pre>
+  </body>
+</html>
