@@ -16,7 +16,7 @@ async def validate_csv(csv_file):
 
     reader = csv.DictReader(content.splitlines())
 
-    required_columns = ['Serial Number', 'Product Name', 'Input Image Urls']
+    required_columns = ['S. No.', 'Product Name', 'Input Image Urls']
 
     if required_columns != (reader.fieldnames):
         raise CustomException(f"Missing columns. Required columns are: {required_columns}")
@@ -25,11 +25,11 @@ async def validate_csv(csv_file):
         if len(row) != 3:
             raise CustomException(f"Row {row_number}: Invalid number of columns")
         
-        serial_number = row.get('Serial Number')
+        serial_number = row.get('S. No.')
         product_name = row.get('Product Name')
         input_image_urls = row.get('Input Image Urls')
         
-        if not serial_number.isdigit():
+        if not serial_number.strip(".").strip().isdigit():
             raise CustomException(f"Invalid Serial Number at row {row_number}: {serial_number}")
         
         # Validate Product Name

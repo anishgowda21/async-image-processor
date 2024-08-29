@@ -1,5 +1,6 @@
-Serial Number,Product Name,Input Image Urls
-1,Product A,"http://example.com/image1.jpg,http://example.com/image2.jpg"
-2,Product B,"http://example.com/image3.jpg,http://example.com/image4.jpg"
-3,Product C,http://example.com/image5.jpg
-4,Product D,"http://example.com/image6.jpg,http://example.com/image7.jpg"
+S. No.,Product Name,Input Image Urls
+1,Wildlife Collection,"https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/animal-8420313_1280.jpg,https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/peacock-8440548_1280.jpg,https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/dog-8448345_1280.jpg"
+2,Nature Mix,"https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/animal-8748794_1280.jpg,https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/skagit-valley-tulip-festival-8683617_1280.jpg"
+3,Exotic Bird,"https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/hornbill-8201730_1280.png"
+4,Colorful Objects,"https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/color-pencils-5699634_1280.jpg,https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/droplets-7401411_1280.jpg"
+5,Fresh Fruit,"https://imagecompress211.blr1.cdn.digitaloceanspaces.com/images/fruit-8283261_1280.jpg"
