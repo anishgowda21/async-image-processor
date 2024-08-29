@@ -3,8 +3,8 @@ import os
 
 ACCESS_ID = os.getenv("ACCESS_ID")
 SECRET_KEY = os.getenv("SECRET_KEY")
-REGION_NAME = 'blr1'  # DigitalOcean region name should be in lowercase
-ENDPOINT_URL = 'https://imagecompress211.blr1.digitaloceanspaces.com'
+REGION_NAME = os.getenv("REGION_NAME")
+ENDPOINT_URL = os.getenv("ENDPOINT_URL")
 
 
 async def upload(file_obj, bucket_name, obj_name):
