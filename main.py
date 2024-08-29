@@ -34,10 +34,12 @@ async def upload_csv(
         return JSONResponse(content={"requestId": request_id}, status_code=202)
 
     except CustomException as err:
-        raise HTTPException(status_code=400, detail=str(err))
+        return JSONResponse(content={"error": str(err)}, status_code=400)
+
     except Exception as err:
         print(err)
-        raise HTTPException(status_code=500, detail="Something went wrong")
+        return JSONResponse(content={"error": "Something went wrong"}, status_code=500)
+
 
 @app.get("/api/status/{request_id}")
 async def get_status(request_id: str):
