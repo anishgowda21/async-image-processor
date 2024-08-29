@@ -1,5 +1,5 @@
-import asyncio
-from fastapi import FastAPI, UploadFile, File, HTTPException,BackgroundTasks
+from typing import List
+from fastapi import FastAPI, UploadFile, File, HTTPException,BackgroundTasks,Form
 from fastapi.responses import JSONResponse
 import uuid
 from utils.validatecsv import validate_csv
@@ -11,7 +11,11 @@ from My_models.job_status import JobStatus
 app = FastAPI()
 
 @app.post("/api/upload")
-async def upload_csv(background_tasks: BackgroundTasks,file: UploadFile = File(...)):
+async def upload_csv(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    webhook_urls: List[str] = Form(default=[])
+    ):
     try:
         csv_stat = await validate_csv(file)        
         request_id = str(uuid.uuid4())
@@ -19,7 +23,8 @@ async def upload_csv(background_tasks: BackgroundTasks,file: UploadFile = File(.
         await db_ops.insert_job({
             "requestId": request_id,
             "status": "pending",
-            "output_url": ""
+            "output_url": "",
+            "webhook_urls": webhook_urls
         })
 
         background_tasks.add_task(process_csv,csv_stat,request_id)
