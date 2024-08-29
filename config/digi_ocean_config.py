@@ -3,7 +3,7 @@ import os
 
 ACCESS_ID = os.getenv("ACCESS_ID")
 SECRET_KEY = os.getenv("SECRET_KEY")
-REGION_NAME = os.getenv("REGION_NAME")
+REGION_NAME = 'blr1'
 ENDPOINT_URL = os.getenv("ENDPOINT_URL")
 
 

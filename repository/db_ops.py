@@ -21,6 +21,13 @@ class DatabaseOperations:
     async def get_job_status(self, request_id):
         job = await self.db.jobs.find_one({"requestId": request_id})
         return job if job else None
+    
+    async def add_webhook(self,request_id, webhook_url):
+        await self.db.jobs.update_one(
+        {"requestId": request_id},
+        {"$push": {"webhook_urls": webhook_url}}
+    )
+        
 
 mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 db_ops = DatabaseOperations(mongo_url)

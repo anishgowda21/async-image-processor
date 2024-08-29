@@ -1,5 +1,4 @@
-from typing import List
-from fastapi import FastAPI, UploadFile, File,BackgroundTasks,Form,Request
+from fastapi import FastAPI, UploadFile, File,BackgroundTasks,Form,Request,Response,status
 from fastapi.responses import JSONResponse
 import uuid
 from fastapi.responses import HTMLResponse
@@ -51,26 +50,35 @@ async def upload_csv(
 
 @app.get("/api/status/{request_id}")
 async def get_status(request_id: str):
-    job = await db_ops.get_job_status(request_id)
-    if job:
-        return JobStatus(
-            requestId=job["requestId"],
-            status=job["status"],
-            output_url= job['output_url']
-        )
-    return JSONResponse(content={"error": "Job not found"}, status_code=404)
+    try:
+        job = await db_ops.get_job_status(request_id)
+        if job:
+            return JobStatus(
+                requestId=job["requestId"],
+                status=job["status"],
+                output_url= job['output_url']
+            )
+        return JSONResponse(content={"error": "Job not found"}, status_code=404)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={"error": "Something went wrong"}, status_code=500)
 
 
 @app.post("/api/webhook/{request_id}")
 async def add_webhook(request_id: str, webhook_url: str = Form(...)):
-    job = await db_ops.get_job_status(request_id)
-    if not job:
-        return JSONResponse(content={"error": "Job not found"}, status_code=404)
-    
-    if job['status'] != 'pending':
-        return JSONResponse(content={"error": "Cannot add webhook to a completed job"}, status_code=400)
+    try:
+        job = await db_ops.get_job_status(request_id)
+        if not job:
+            return JSONResponse(content={"error": "Job not found"}, status_code=404)
+        
+        if job['status'] != 'pending':
+            return JSONResponse(content={"error": "Cannot add webhook to a completed job"}, status_code=400)
 
-    await db_ops.add_webhook(request_id, webhook_url)
-    return JSONResponse(content={"message": "Webhook added successfully"}, status_code=200)
+        await db_ops.add_webhook(request_id, webhook_url)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={"error": "Something went wrong"}, status_code=500)
+
 
 
